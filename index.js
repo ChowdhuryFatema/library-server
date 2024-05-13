@@ -103,7 +103,6 @@ app.post('/logout', async(req, res) => {
         return res.status(403).send({message: 'forbidden access'})
       }
 
-
       let query = {};
       if(req.query?.email){
         query = {email: req.query.email}
@@ -112,8 +111,6 @@ app.post('/logout', async(req, res) => {
         const result = await booksCollection.find().toArray();
         res.send(result) 
     })
-
-
 
     app.get('/book/:category', async(req, res) => {
       const cat = req.params.category;
@@ -138,15 +135,11 @@ app.post('/logout', async(req, res) => {
         res.send(result);
     })
 
-  
-
-
     app.put ( '/books/:id', async(req, res) => {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)}
       const options = { upsert: true };
       const updatedDetails = req.body;
-
       
    const books = {
         $set: {
@@ -158,7 +151,6 @@ app.post('/logout', async(req, res) => {
       },
     };
 
-       
       const result = await booksCollection.updateOne(filter, books, options);
       res.send(result);
 
