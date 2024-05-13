@@ -168,7 +168,9 @@ app.post('/logout', async(req, res) => {
     app.post('/borrowedBooks', async(req, res) => {
       console.log(req.body);
       const result = await borrowedBooksCollection.insertOne(req.body);
+
       res.send(result);
+
     })
 
     app.delete('/borrowedBooks/:id', async(req, res) => {
@@ -176,10 +178,9 @@ app.post('/logout', async(req, res) => {
 
       const query = { _id: new ObjectId(id) }
       const result = await borrowedBooksCollection.deleteOne(query);
+
       res.send(result)
     })
-
-
 
 
     // Send a ping to confirm a successful connection
