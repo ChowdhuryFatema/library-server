@@ -6,7 +6,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 const app = express();
-const port = process.env.PORT || 5000; 
+const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors({
@@ -46,13 +46,13 @@ const verifyToken = (req, res, next) => {
   console.log('token in the middleware', token);
 
   // no token available 
-  if(!token){
-    return res.status(401).send({message: 'unauthorized access'})
+  if (!token) {
+    return res.status(401).send({ message: 'unauthorized access' })
   }
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if(err){
-      return res.status(401).send({message: 'unauthorized access'})
+    if (err) {
+      return res.status(401).send({ message: 'unauthorized access' })
     }
     req.user = decoded;
     next()
@@ -63,7 +63,7 @@ const verifyToken = (req, res, next) => {
 const cookeOption = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production' ? true : false,
-  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
 }
 
 async function run() {
@@ -75,81 +75,81 @@ async function run() {
     const borrowedBooksCollection = client.db("libraryDB").collection("borrowedBooks");
 
 
- // auth related api 
+    // auth related api 
 
- app.post('/jwt', async(req, res) => {
-  const user = req.body;
-  console.log(user)
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      console.log(user)
 
-  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET , { expiresIn: '1h' })
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
 
-  res.cookie('token', token, cookeOption)
-  .send({success: true})
+      res.cookie('token', token, cookeOption)
+        .send({ success: true })
 
-})
+    })
 
-app.post('/logout', async(req, res) => {
-  const user = req.body;
-  console.log('log out', user);
-  res.clearCookie('token', {maxAge: 0}).send({success: true})
-})
+    app.post('/logout', async (req, res) => {
+      const user = req.body;
+      console.log('log out', user);
+      res.clearCookie('token', { maxAge: 0 }).send({ success: true })
+    })
 
     // book related api
 
 
-    app.get('/books', logger, verifyToken, async(req, res) => {
+    app.get('/books', logger, verifyToken, async (req, res) => {
 
-      if(req.user?.email !== req.query.email){
-        return res.status(403).send({message: 'forbidden access'})
+      if (req.user?.email !== req.query.email) {
+        return res.status(403).send({ message: 'forbidden access' })
       }
 
       let query = {};
-      if(req.query?.email){
-        query = {email: req.query.email}
+      if (req.query?.email) {
+        query = { email: req.query.email }
       }
 
-        const result = await booksCollection.find().toArray();
-        res.send(result) 
+      const result = await booksCollection.find().toArray();
+      res.send(result)
     })
 
-    app.get('/book/:category', async(req, res) => {
+    app.get('/book/:category', async (req, res) => {
       const cat = req.params.category;
       console.log(cat);
 
 
-      const query = { category: cat}
+      const query = { category: cat }
       const result = await booksCollection.find(query).toArray();
       res.send(result)
     })
 
 
-    app.get('/books/:id', async(req, res) => {
+    app.get('/books/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await booksCollection.findOne(query);
       res.send(result)
     })
 
-    app.post('/books', verifyToken, async(req, res) => {
-        const result = await booksCollection.insertOne(req.body);
-        res.send(result);
+    app.post('/books', verifyToken, async (req, res) => {
+      const result = await booksCollection.insertOne(req.body);
+      res.send(result);
     })
 
-    app.put ( '/books/:id', async(req, res) => {
+    app.put('/books/:id', async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) }
       const options = { upsert: true };
       const updatedDetails = req.body;
-      
-   const books = {
+
+      const books = {
         $set: {
           image: updatedDetails.image,
-          name: updatedDetails.name, 
-          author: updatedDetails.author, 
-          category: updatedDetails.category, 
-          rating: updatedDetails.rating, 
-      },
-    };
+          name: updatedDetails.name,
+          author: updatedDetails.author,
+          category: updatedDetails.category,
+          rating: updatedDetails.rating,
+        },
+      };
 
       const result = await booksCollection.updateOne(filter, books, options);
       res.send(result);
@@ -159,28 +159,32 @@ app.post('/logout', async(req, res) => {
 
     // borrowed Book 
 
-    app.get('/borrowedBooks', async(req, res) => {
+    app.get('/borrowedBooks', async (req, res) => {
       const result = await borrowedBooksCollection.find().toArray();
-      res.send(result) 
-  })
+      res.send(result)
+    })
 
 
-    app.post('/borrowedBooks', async(req, res) => {
+    app.post('/borrowedBooks', async (req, res) => {
       console.log(req.body);
       const result = await borrowedBooksCollection.insertOne(req.body);
 
       res.send(result);
 
+
     })
 
-    app.delete('/borrowedBooks/:id', async(req, res) => {
-      const id = req.params.id;
+    app.delete('/borrowedBooks/:id', async (req, res) => {
 
+      const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await borrowedBooksCollection.deleteOne(query);
-
       res.send(result)
+
+
     })
+
+
 
 
     // Send a ping to confirm a successful connection
@@ -195,9 +199,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send("The server is running")
+  res.send("The server is running")
 })
 
 app.listen(port, () => {
-    console.log(`The server is running on port ${port}`)
+  console.log(`The server is running on port ${port}`)
 })
