@@ -33,8 +33,6 @@ const client = new MongoClient(uri, {
   }
 });
 
-
-
 // middleware 
 const logger = (req, res, next) => {
   console.log('log: info', req.method, req.url);
@@ -68,8 +66,6 @@ const cookeOption = {
   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
 }
 
-
-
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -97,8 +93,6 @@ app.post('/logout', async(req, res) => {
   console.log('log out', user);
   res.clearCookie('token', {maxAge: 0}).send({success: true})
 })
-
-
 
     // book related api
 
