@@ -105,15 +105,15 @@ app.post('/logout', async(req, res) => {
 
     app.get('/books', logger, verifyToken, async(req, res) => {
 
-      // if(req.user?.email !== req.query.email){
-      //   return res.status(403).send({message: 'forbidden access'})
-      // }
+      if(req.user?.email !== req.query.email){
+        return res.status(403).send({message: 'forbidden access'})
+      }
 
 
-      // let query = {};
-      // if(req.query?.email){
-      //   query = {email: req.query.email}
-      // }
+      let query = {};
+      if(req.query?.email){
+        query = {email: req.query.email}
+      }
 
         const result = await booksCollection.find().toArray();
         res.send(result) 
@@ -139,7 +139,7 @@ app.post('/logout', async(req, res) => {
       res.send(result)
     })
 
-    app.post('/books', async(req, res) => {
+    app.post('/books', verifyToken, async(req, res) => {
         const result = await booksCollection.insertOne(req.body);
         res.send(result);
     })
