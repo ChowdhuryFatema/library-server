@@ -12,8 +12,8 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    // 'https://car-doctor-791f6.web.app',
-    // 'https://car-doctor-791f6.firebaseapp.com',
+    'https://library-2dd53.web.app',
+    'https://library-2dd53.firebaseapp.com',
   ],
   credentials: true
 }));
@@ -81,7 +81,7 @@ async function run() {
       const user = req.body;
       console.log(user)
 
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' })
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '365d' })
 
       res.cookie('token', token, cookeOption)
         .send({ success: true })
@@ -183,7 +183,6 @@ async function run() {
 
 
     })
-
 
 
 
