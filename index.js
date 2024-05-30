@@ -108,9 +108,24 @@ async function run() {
         query = { email: req.query.email }
       }
 
+      const filter = req.query;
+
+      const queryTitle = {
+        name: {$regex: filter.search, $options: 'i'}
+      } 
+
+      const cursor = await booksCollection.find(queryTitle).toArray();
+      res.send(cursor);
+    })
+    
+
+    app.get('/booksCat', async (req, res) => {
+
       const result = await booksCollection.find().toArray();
       res.send(result)
     })
+
+
 
     app.get('/book/:category', async (req, res) => {
       const cat = req.params.category;
